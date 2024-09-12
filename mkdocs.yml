@@ -14,7 +14,7 @@ markdown_extensions:
   - mdx_math
 nav:
   - Introduction: index.md
-  - Regular Expressions: general_regex.md
+  - Preconcepts: preconcepts.md
   - Structures: structures.md
   - Obtaining DFA: obtain_dfa.md
-  - Obtaining Circom code: obtain_circom.md
+  - Obtaining circuit: obtain_circom.md

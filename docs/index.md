@@ -1,5 +1,5 @@
 # Understanting ZK Regex
-## General idea of the project
+If you are not sure what a regular expression or a DFA are, we strongly recommend you to visit the **preconcepts** page.
 
 Use Zero-Knowledge Proofs and regular expressions to validate strings. An arithmetic circuit is generated using Circom.
 
@@ -9,7 +9,5 @@ In particular, the protocol is programmed in Rust and there are two high-level r
 
 - Convert the regular expression into a deterministic finite automaton (DFA), ideally minimal, using techniques of Language Theory. The goal is to preserve the parts indicated as secret in the regular expression as secret in the DFA. Remember that formally a DFA is a \(5\)-uple \(M = \langle Q, \Sigma, \delta, q_0, F \rangle\). In this project, different structures are used to represent (and hide) its data, but broadly speaking, it is thought of as a directed graph.
 - Convert the DFA into a Circom circuit. Specifically, from the DFA, a `.circom` file is generated whose constraints represent the DFA.
-
-## What is a regular expression?
 
 ## Useful links

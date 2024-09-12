@@ -1,6 +1,6 @@
-# Convert from DFA to .circom
+# Convert from DFA to a Circom circuit
 
-## Obtain Circom code (yes, in a String!)
+## Obtain Circom code
 ```rust
 fn gen_circom_allstr( // every other parameter except for the template comes from the RegexAndDFA
   dfa_graph: &DFAGraph,
@@ -9,6 +9,8 @@ fn gen_circom_allstr( // every other parameter except for the template comes fro
   end_anchor: bool,
 ) -> String
 ```
+Yes, all the Circom code will be in a very big string that can be saved as a `.circom` file.
+
 - Se construye el AFD en reversa de `dfa_graph`. Esta parte devuelve un `(Map<usize, Map<usize, Vec<u8>>>, Set<usize>)`.
   - El primer elemento de la tupla es el AFD en reversa. La notación quiere decir que el mapeo $\sigma: Q \to \mathcal{P}(Q)$ está dado por
   $$\sigma(q) = $$

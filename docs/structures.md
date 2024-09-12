@@ -1,9 +1,9 @@
 # Structures
 All this structures derive the traits `Debug` and `Clone`. Besides, they are all serializable (using the `serde` crate) except from the structures that have the prefix `Info`.
 
-In general, every `Map` and `Set` are implemented as `BTreeMap` and `BTreeSet`, while every `Deque` is implemented as `VecDeque`, but for simplicity of functionalities we will write them as the basic names in this document.
+In general, every `Map` and `Set` are implemented as `BTreeMap` and `BTreeSet`, while every `Deque` is implemented as `VecDeque`, but for simplicity of functionalities we will refer to them as the basic names in this document.
 
-## Estructura principal
+## Main structure
 ```rust
 pub struct RegexAndDFA {
   pub regex_pattern: String,
@@ -12,6 +12,11 @@ pub struct RegexAndDFA {
   pub substrings: SubstringsDefinitions
 }
 ```
+For the creation of the circuit, we need to create the DFA from the regular expression. However, in the main structure we will save both of them. Also, we will have the `SubstringsDefinitions` for all the public parts.
+
+Observe that the `regex_pattern` is a `String`. This means that we will concatenate all of the parts given by the JSON input file to the program into a single string.
+
+The `has_end_anchor` means what we expect. Its purpose is... TODO
 
 ## RegexPart
 ```rust
@@ -25,11 +30,34 @@ pub struct DecomposedRegexConfig {
 }
 ```
 
-The input to the program will be a JSON file containing an object with a single attribute `parts`, which is an array of objects with the parameters `is_public` and `regex_def` (those of RegexPartConfig), from which we construct a `DecomposedRegexConfig`.
+The input to the program will be a JSON file containing an object with a single attribute `parts`, which is an array of objects with the parameters `is_public` and `regex_def` (those of the `RegexPartConfig` structure), from which we construct a `DecomposedRegexConfig`. An example of a JSON object for input is:
+```json
+{
+  "parts": [
+    {
+      "regex_def": "m[01]+-",
+      "is_public": false
+    },
+    {
+      "regex_def": "[ab]+",
+      "is_public": true
+    },
+    {
+      "regex_def": ";",
+      "is_public": false
+    }
+  ]
+}
+```
 
 In turn, the input to the function `fn get_regex_and_dfa` will be a mutable reference to a `DecomposedRegexConfig`. The idea is for the program to analyze each part of the regular expression separately using the `regex_def` property.
 
-The advantage of having multiple parts of the regular expression is that we can reveal some and keep others hidden (using the `is_public` property). As a limitation, the division into parts must occur after a step where the regular expression can be written as a concatenation of the parts (i.e., the parts must be valid).
+The advantage of having multiple parts of the regular expression is that we can reveal some and keep others hidden (using the `is_public` property). As a limitation, the division into parts must occur after a step where the regular expression can be written as a concatenation of the parts (i.e., the parts must be valid). For example:
+
+- The regular expression given by `[01]*[ab]+` can be separated in parts in multiple ways, for example: `[01]*`, `[ab]` and `[ab]*`.
+- The regular expression given by `[[01]*[ab]*]*` cannot be separated in parts in any way. This means it will be completely public or completely private when we generate the code.
+
+However, it is important to address that for nearly every useful regular expression, it will be possible to separate it in parts as we want.
 
 ## DFA
 ```rust
@@ -54,9 +82,11 @@ pub struct DFAGraph {
 ```
 Let's assume that each node in the DFA will have an index for identification purposes. As we merge the graphs of each part into a single graph called `net_dfa_graph`, we need to update the set of states, and more importantly, the indices and edges of each node, to avoid index collisions. This renaming must not affect the structure of the DFA.
 
+The `DFAStateInfo` is... TODO
+
 We focus on the `DFAStateNode` structure: the `state_type` property indicates whether a state is final, the `state_id` property indicates the index of the state in the graph, and the `transitions` property is the set of edges, represented as a `Map<usize, Set<u8>>` where each node index has a set of valid characters (i.e., a `Set<u8>`) that allow the transition.
 
-To facilitate the semantic analogy, the code refers to `transitions` as edges in the remaining functions, without considering the case of a multigraph.
+To facilitate the semantic analogy, the code refers to `transitions` as edges in the remaining functions, without considering the case of a multigraph (remember that in a graph that is not a multigraph, there can only be one edge between two given nodes, and if there is more than one character that allows a transition between two states in the DFA, there will be more than one edge).
 
 ## Substring Definitions
 ```rust
