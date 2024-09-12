@@ -1,0 +1,15 @@
+# Regular Expressions
+- A `\` followed by a character that is not a newline matches that character. This includes all special characters.
+- A caret `^` matches the start of a line.
+- A dollar sign `$` matches the end of a line.
+- A dot `.` matches any character.
+- A single character that has no special meaning matches that character.
+- A string enclosed in square brackets `[]` matches any character in the string. ASCII characters can also be abbreviated as `a-z0-9`. If a `^` is the first character inside the brackets, it matches any character that is NOT inside the brackets.
+- A regular expression followed by an asterisk `*` matches a sequence of zero or more occurrences of the regular expression.
+- A regular expression followed by a plus sign `+` matches a sequence of one or more occurrences of the regular expression.
+- A regular expression followed by a question mark `?` matches a sequence of zero or one occurrence of the regular expression.
+- Two concatenated regular expressions match an occurrence of the first followed by one of the second.
+- Two regular expressions separated by a pipe `|` match an occurrence of the first or the second.
+- Parentheses are used to group a regular expression (and then apply special characters as needed).
+- Using `@` makes the regular expressions case-sensitive.
+- Using `~` makes the regular expressions case-insensitive.
