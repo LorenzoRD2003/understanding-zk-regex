@@ -1,5 +1,5 @@
 # Understanting ZK Regex
-If you are not sure what a regular expression or a DFA are, we strongly recommend you to visit the **preconcepts** page.
+If you are not sure what a regular expression or a DFA are, we strongly recommend you to visit the **Concepts** page.
 
 Use Zero-Knowledge Proofs and regular expressions to validate strings. An arithmetic circuit is generated using Circom.
 
@@ -11,3 +11,6 @@ In particular, the protocol is programmed in Rust and there are two high-level r
 - Convert the DFA into a Circom circuit. Specifically, from the DFA, a `.circom` file is generated whose constraints represent the DFA.
 
 ## Useful links
+- [ZK Regex](https://zkregex.com/)
+- [ZK Email](https://prove.email/)
+- [ZK Regex Graph Visualizer](https://zkregex.com/min_dfa) (this is outdated)

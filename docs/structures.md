@@ -16,7 +16,7 @@ For the creation of the circuit, we need to create the DFA from the regular expr
 
 Observe that the `regex_pattern` is a `String`. This means that we will concatenate all of the parts given by the JSON input file to the program into a single string.
 
-The `has_end_anchor` means what we expect. Its purpose is... TODO
+The `has_end_anchor` means what we expect. Remember from the **Concepts** page that a dollar sign `$` in a regular expression matches the end of a line (or in the usual case, the end of a regular expression). This is why it is also called a _end anchor_, and it means that we should be looking for a match at the end of a string. Combining it with the _starting anchor_ `^`, it is usual to convert a regex `r` into `^r$`. In particular, here the puropose of the `has_end_anchor` boolean is to provide extra information to the Circom code generator.
 
 ## RegexPart
 ```rust
@@ -80,11 +80,21 @@ pub struct DFAGraph {
   pub states: Vec<DFAStateNode>
 }
 ```
-Let's assume that each node in the DFA will have an index for identification purposes. As we merge the graphs of each part into a single graph called `net_dfa_graph`, we need to update the set of states, and more importantly, the indices and edges of each node, to avoid index collisions. This renaming must not affect the structure of the DFA.
+First of all, let's talk about the `DFAGraphInfo` structure. It is useful when transitioning from the `regex_and_automata::dfa` Rust crate structure to the `DFAGraph` structure. In particular, the properties in a `DFAStateInfo` have the following meaning:
 
-The `DFAStateInfo` is... TODO
+- `typ` has the value `"accept"` if and only if it is an accepting state in the DFA.
+- `source` is the identifier of the state.
+- `edges` refer to the transitions from the state to other states in the DFA. Note that the map keys are `String`. They are interpeted as regular expressions for efficiency, as there can be _ranges_. So there will be two type of edges, single character edges and range edges (for example, the map could be `{("A-Z", 1), ("a-z", 2)}, ("0-9", 3), (";", 4), ("t", 5)`).
+
+In the algorithm, we will process each ``RegexPartConfig` and obtain a `DFAGraph` (in the middle, we will have the `DFAGraphInfo`), we will assume that each node in the DFA has an identifier. As we merge the `DFAGraph` of each part into a single graph called `net_dfa_graph`, we need to update the set of states, and more importantly, the indices and edges of each node, to avoid index collisions. This renaming must not affect the structure of the DFA.
 
 We focus on the `DFAStateNode` structure: the `state_type` property indicates whether a state is final, the `state_id` property indicates the index of the state in the graph, and the `transitions` property is the set of edges, represented as a `Map<usize, Set<u8>>` where each node index has a set of valid characters (i.e., a `Set<u8>`) that allow the transition.
+
+This is different than in the DFA theoretical model, as there the transition function is total, and that means there will need to exist a transition for each character and each state. So when we recieve an invalid character, we go to an error state that only has transitions to itself, and the string is not recognized by the DFA. In the implementation, as it would be too much to have \(2^8 = 256\) transitions for each character, we have the map, which is essentially a different function for each state \(q\)
+$$f: Q \to \mathcal{P}(\Sigma)$$
+meaning that it maps each possible next state \(p\) (given its index) to the set of characters of the alphabet that allow a transition from $q$. It is important that:
+$$\forall p \neq p' \in Q, f(p) \cap f(p') = \emptyset$$
+meaning that in fact the DFA is deterministic.
 
 To facilitate the semantic analogy, the code refers to `transitions` as edges in the remaining functions, without considering the case of a multigraph (remember that in a graph that is not a multigraph, there can only be one edge between two given nodes, and if there is more than one character that allows a transition between two states in the DFA, there will be more than one edge).
 
