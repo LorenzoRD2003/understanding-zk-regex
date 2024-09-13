@@ -1,6 +1,6 @@
 site_name: Understanding ZK Regex
-docs_dir: docs
-site_dir: src
+docs_dir: markdown_files
+site_dir: docs
 theme:
   name: mkdocs
   color_mode: auto
