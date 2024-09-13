@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Obtaining the Circuit - Understanding ZK Regex</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" disabled>
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Understanding ZK Regex</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Introduction</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../preconcepts/" class="nav-link">Concepts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../structures/" class="nav-link">Structures</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../obtain_dfa/" class="nav-link">Obtaining the DFA</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Obtaining the Circuit</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../obtain_dfa/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                              <button id="theme-menu" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme" class="nav-link dropdown-toggle">
+                                <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                <span class="d-lg-none ms-2">Toggle theme</span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="fa-solid fa-sun fa-fw"></i>
+                                    <span class="ms-2">Light</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="fa-solid fa-moon fa-fw"></i>
+                                    <span class="ms-2">Dark</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                    <span class="ms-2">Auto</span>
+                                    <i class="fa-solid fa-check ms-auto"></i>
+                                  </button>
+                                </li>
+                              </ul>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script src="../js/darkmode.js"></script>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#convert-from-dfa-to-a-circom-circuit" class="nav-link">Convert from DFA to a Circom circuit</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#generate-the-reverse-graph-of-dfa_graph" class="nav-link">Generate the reverse graph of dfa_graph</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#generate-the-state-transition-logic" class="nav-link">Generate the state transition logic</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#generate-the-bureaucratic-circom-code" class="nav-link">Generate the bureaucratic Circom code</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#combine-all-the-generated-circom-code-and-return" class="nav-link">Combine all the generated Circom code and return.</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="convert-from-dfa-to-a-circom-circuit">Convert from DFA to a Circom circuit</h1>
+<p>The first function called is</p>
+<pre><code class="language-rust">fn generate_outputs(
+  regex_and_dfa: &amp;RegexAndDFA,
+  halo2_dir_path: Option&lt;&amp;str&gt;,
+  circom_file_path: Option&lt;&amp;str&gt;,
+  circom_template_name: Option&lt;&amp;str&gt;,
+  num_public_parts: usize,
+  gen_substrs: bool,
+) -&gt; Result&lt;(), CompilerError&gt;
+</code></pre>
+<p>As we will use Circom for this document, we assume that the <code>halo2_dir_path</code> input is <code>None</code>. The important parameter here is <code>regex_and_dfa</code>, which is a reference to the <code>RegexAndDFA</code> structure generated in the process described in <strong>Obtaining the DFA</strong>.</p>
+<p>The other inputs are for us to specify the name of the file path to the <code>.circom</code> output file, the template name of the circuit in Circom, the number of public parts of the regular expression for which we generated the <code>RegexAndDFA</code> structure (although this is only used to generate multiple output file paths in the Halo2 version) and the <code>gen_substrs</code> bool, which purpose is to add substring constraints to the code generated by the following, and in fact most important function, <code>gen_circom_allstr</code>.</p>
+<pre><code class="language-rust">fn gen_circom_allstr( // every other parameter except for the template comes from the RegexAndDFA
+  dfa_graph: &amp;DFAGraph,
+  template_name: &amp;str, // name of the Circom template
+  regex_str: &amp;str,
+  end_anchor: bool,
+) -&gt; String
+</code></pre>
+<p>(yes, all the Circom code will be in a very big string that can be saved as a <code>.circom</code> file)</p>
+<p>The <code>dfa_graph</code>, <code>regex_str</code> and <code>end_anchor</code> parameters are references to parts of the <code>RegexAndDFA</code> structure generated in the the process described in <strong>Obtaining the DFA</strong>.</p>
+<h2 id="generate-the-reverse-graph-of-dfa_graph">Generate the reverse graph of <code>dfa_graph</code></h2>
+<p>Given a directed graph <script type="math/tex">G = (V, E)</script>, the reverse graph <script type="math/tex">G^r = (V, E^r)</script> is the directed graph with its edges reversed. This means that there exists an edge <script type="math/tex">u \to v \in E</script> if and only if there exists an edge <script type="math/tex">v \to u \in E^r</script>.</p>
+<p>In a DFA <script type="math/tex">M</script> with graph representation, it is not so simple to construct a reverse DFA <script type="math/tex">M^r</script>, because we also need to assert there is only one starting state in <script type="math/tex">M^r</script>, and there may be multiple accepting states in <script type="math/tex">M</script>. It is possible to solve this, by creating an extra node with <script type="math/tex">\lambda</script>-transitions to each of the accepting states in <script type="math/tex">M</script> and setting this at the starting node in <script type="math/tex">M^r</script>. However, the obtained structure is a NFA, and we have to determinize it.</p>
+<p>We have explained this because it important to address that this is what the <code>build_reverse_graph</code> function DOES NOT DO, as it only reverts the edges of a (multi)graph and collects the accepting states of the <code>dfa_graph</code>.</p>
+<p>The <code>build_reverse_graph</code> function recieves both the number of states and the <code>dfa_graph</code> and returns both the reverse graph (as a <code>Map&lt;usize, Map&lt;usize, Vec&lt;u8&gt;&gt;&gt;</code>) and the accepting states (as a <code>Set&lt;usize&gt;</code>). It is important to understand what this structure represents, as it maps the ID of a state <script type="math/tex">q \in Q</script> to the IDs of the states <script type="math/tex">Q' \subseteq Q</script> from which it recieved a transition in the <code>dfa_graph</code>, and it represents each of these states <script type="math/tex">q' \in Q'</script> as a map from their ID to a vector with the characters that allowed the transition <script type="math/tex">q' \to q</script> in the <code>dfa_graph</code>. Finally, the function also checks there exists an accepting state in the graph, panicking if not.</p>
+<h2 id="generate-the-state-transition-logic">Generate the state transition logic</h2>
+<p>Given the reverse graph <code>rev_graph</code>, the <code>generate_state_transition_logic</code> function creates the core logic for state transitions in the DFA, including range checks, equality checks, and multi-OR operations. In particular, it creates multiple lines of Circom code with calls to the basic components used. These components can be found in the <strong>Concepts</strong> section.</p>
+<p>In fact, this function returns lots of things in a tuple:
+- The number of <code>IsEqual</code> checks used.
+- The number of <code>LessEqThan</code> checks used.
+- The number of <code>AND</code> gates used.
+- The number of <code>MultiOR</code> gates used.
+- A <code>Vec&lt;String&gt;</code> containing the generated Circom code lines. This is the most important output of the function.</p>
+<p>This function is very complex and its explanation will be divided in many subsections.</p>
+<h3 id="initialize-counters-and-data-structures-for-different-types-of-checks">Initialize counters and data structures for different types of checks</h3>
+<p>It defines mutable variables for the values that will be returned as output of the function, which are counters for the amount of gates of each type: </p>
+<ul>
+<li>The number of <code>IsEqual</code> checks used.</li>
+<li>The number of <code>LessEqThan</code> checks used.</li>
+<li>The number of <code>AND</code> gates used.</li>
+<li>The number of <code>MultiOR</code> gates used.</li>
+</ul>
+<p>It also defines the following mutable data structures:</p>
+<ul>
+<li><code>range_checks</code> as a <code>Vec&lt;Vec&lt;usize; 256&gt;; 256&gt;</code> (in fact, with <code>Option</code>)</li>
+<li><code>eq_checks</code> as a <code>Vec&lt;usize; 256&gt;</code> (in fact, with <code>Option</code>)</li>
+<li><code>multi_or_checks1</code> as a <code>Map&lt;String, usize&gt;</code></li>
+<li><code>multi_or_checks2</code> as <code>Map&lt;String, usize&gt;</code></li>
+<li><code>zero_starting_states</code> as a <code>Vec&lt;usize&gt;</code></li>
+<li><code>zero_starting_and_idxes</code> as a <code>Map&lt;usize, Vec&lt;usize&gt;&gt;</code></li>
+<li><code>lines</code> as a <code>Vec&lt;String&gt;</code>. It just has every line of the <code>.circom</code> main component generated by this function.</li>
+</ul>
+<h3 id="a-bit-about-how-the-circom-circuit-will-have">A bit about how the Circom circuit will have</h3>
+<p>We consider that there are <script type="math/tex">n</script> states in the DFA and that the message to validate with the regular expression is a string <script type="math/tex">s</script> of length <script type="math/tex">k</script> (with starting anchor <code>^</code>). Then, we will have the following signals</p>
+<ul>
+<li><code>in[k]</code> as the input signals. We will have one for each character, where its value will be from <script type="math/tex">0</script> to <script type="math/tex">255</script>.</li>
+<li><code>states[k + 1][n]</code>, which represent the state transitions based on the input. In fact, at the beginning it will be <code>states[0][j] = 0</code> <script type="math/tex">\forall 0 \leq j < n</script>, and we will calculate <code>states[i][j] = 1</code> if  and only if <script type="math/tex">\delta(s_i, q_{j-1}) = q_j</script>
+<script type="math/tex">\forall 0 \leq i \leq k, </script>, which will translate to different code depending on the transition function context.</li>
+<li><code>states_tmp[k + 1][n]</code>, which is a helper signal to handle complicated conditions. We will address where it is used.</li>
+<li><code>state_changed[k]</code> that will have a boolean in the position <script type="math/tex">i</script> if there was progress when processing the <script type="math/tex">i</script>-th character of the string. This means we changed the state correctly. For this to happen, we need to have success at using the comparison components explained in <strong>Concepts</strong> to check if an input matches a character, a set of characters, or a range.</li>
+<li><code>from_zero_enabled[k + 1]</code>, which checks that after processing the <script type="math/tex">i</script>-th character we are in the initial (zero) state. For example, one of its uses is that if we have <code>from_zero_enabled[i] = 1</code> and we are able to transition from state <code>0</code> to <code>1</code>, we have to go to state <code>1</code> directly.</li>
+<li><code>is_consecutive[k + 1][n - 1]</code>, which address the question of keeping track of whether the matches are consecutive across the input, ensuring that patterns requiring consecutive elements are correctly validated.</li>
+<li><code>final_state_result</code>, which is the output signal that is <code>0</code> or <code>1</code> depending if at some moment we managet to get to the UNIQUE final state of the DFA.</li>
+</ul>
+<p>One example that usually appears in the code is that
+<script type="math/tex; mode=display">\text{state_changed}[i] = \bigwedge_{i=1}^{n} \text{states}[i + 1][j]</script>
+is implemented as an <code>AND(n - 1)</code> component, which means that we change the state in the <script type="math/tex">i</script>-th step if we transition when we are reading the <script type="math/tex">i</script>-th element, something that is addressed in the <script type="math/tex">(i+1)</script>-th row of <code>states</code>.</p>
+<p>TODO: Add a simple example (regular expression <code>a[bc][de]*f</code> and input <code>abcdedef</code>).</p>
+<p>Remember that not every DFA <code>M</code> will have a topologically sorted graph (i.e. it may have cycles), so it is not as sequential as we want it to be.</p>
+<h3 id="generate-the-circom-code-for-each-state-in-the-dfa">Generate the Circom code for each state in the DFA</h3>
+<p>We will use the following auxiliar functions for each state in the DFA (going sequentially from <script type="math/tex">0</script> up to <script type="math/tex">n - 1</script>):</p>
+<ul>
+<li>Not an auxiliar function, but it updates the <code>zero_starting_states</code> and <code>zero_starting_and_idxes</code> data structures for the current state in the DFA.</li>
+<li><code>optimize_char_ranges</code>:</li>
+<li><code>add_range_check</code>:</li>
+<li><code>add_eq_check</code>:</li>
+<li><code>add_state_transition</code>:</li>
+<li><code>add_state_update</code>:</li>
+<li><code>add_from_zero_enabled</code>:</li>
+<li><code>add_zero_starting_state_updates</code>:</li>
+<li><code>add_state_changed_updates</code>:</li>
+</ul>
+<h2 id="generate-the-bureaucratic-circom-code">Generate the bureaucratic Circom code</h2>
+<p>The function <code>generate_declarations</code> adds everything that every <code>.circom</code> circuit should have, for example the <code>pragma</code>, the <code>include</code> declarations and the circuit template. However, there will have to be many parameters inside the template (for numerating the amount of components for each type of gates), and there is where we use the parameters recieved by the <code>generate_state_transition_logic</code> function.</p>
+<p>The function <code>generate_init_code</code> generates the initialization code for the Circom circuit, by creating the code to initialize all states except the first one to 0.</p>
+<p>The function <code>generate_accept_logic</code> recieves the set of accepting nodes and the boolean indicating if there is an ending anchor, and generates the acceptance logic for the Circom circuit. In particular, this function creates the code to check if the DFA has reached an accepting state, and handles the ending anchor logic in the case it is present. Unless there is exactly one accepting node, it will panic (this is supposed to be enhanced in future ZK Regex versions).</p>
+<h2 id="combine-all-the-generated-circom-code-and-return">Combine all the generated Circom code and return.</h2>
+<p>The final code is a <code>String</code> generated by the concatenation of the following vectors of strings:</p>
+<ul>
+<li><code>declarations</code>, returned by the <code>generate_declarations</code> function.</li>
+<li><code>init_code</code>, returned by the <code>generate_init_code</code> function.</li>
+<li><code>lines</code>, returned by the <code>generate_state_transition_logic</code> function.</li>
+<li><code>accept_lines</code>, returned by the <code>generate_accept_logic</code> function.</li>
+</ul>
+<p>And it will be saved as a <code>.circom</code> file so everyone can use it!</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
