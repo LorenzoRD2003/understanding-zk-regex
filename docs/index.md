@@ -1,4 +1,4 @@
-# Understanting ZK Regex
+# Understanding ZK Regex
 If you are not sure what a regular expression or a DFA are, we strongly recommend you to visit the **Concepts** page.
 
 Use Zero-Knowledge Proofs and regular expressions to validate strings. An arithmetic circuit is generated using Circom.

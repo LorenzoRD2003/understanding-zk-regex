@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Concepts - Understanding ZK Regex</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" disabled>
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Understanding ZK Regex</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Introduction</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Concepts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../structures/" class="nav-link">Structures</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../obtain_dfa/" class="nav-link">Obtaining the DFA</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../obtain_circom/" class="nav-link">Obtaining the Circuit</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../structures/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                              <button id="theme-menu" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme" class="nav-link dropdown-toggle">
+                                <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                <span class="d-lg-none ms-2">Toggle theme</span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="fa-solid fa-sun fa-fw"></i>
+                                    <span class="ms-2">Light</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="fa-solid fa-moon fa-fw"></i>
+                                    <span class="ms-2">Dark</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                    <span class="ms-2">Auto</span>
+                                    <i class="fa-solid fa-check ms-auto"></i>
+                                  </button>
+                                </li>
+                              </ul>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script src="../js/darkmode.js"></script>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#preconcepts" class="nav-link">Preconcepts</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#regular-expressions" class="nav-link">Regular Expressions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#deterministic-finite-automaton-dfa" class="nav-link">Deterministic Finite Automaton (DFA)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#relation-between-regular-expressions-and-dfa" class="nav-link">Relation between regular expressions and DFA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#circom-circuits" class="nav-link">Circom Circuits</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#useful-links" class="nav-link">Useful links</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="preconcepts">Preconcepts</h1>
+<h2 id="regular-expressions">Regular Expressions</h2>
+<p>A regular expression <script type="math/tex">r</script> is a sequence of characters that defines a search pattern. We say that, given an alphabet <script type="math/tex">\Sigma</script> a regular expression <em>describes</em> a language <script type="math/tex">\mathcal{L} \subseteq \Sigma</script>. Regular expressions are used primarily for string pattern matching and manipulation. Outside of the Zero-Knowledge world, they have worked as powerful tools for:</p>
+<ul>
+<li>Searching for specific patterns within a text. For example, you might use a regex to find all occurrences of email addresses in a document.</li>
+<li>Substituting one pattern with another. For instance, you could use a regex to replace all instances of a specific word with a new one.</li>
+<li>Checking if a string matches a predefined format, such as ensuring an input is a valid phone number or email address.</li>
+<li>Breaking a string into substrings based on a pattern. For example, splitting a CSV string into its component values.</li>
+</ul>
+<p>The standards for regular expression notation (and in fact, the notation recognized by this converter) are determined by literals, metacharacters, quantifiers, anchors, character classes and groups. In particular, they are defined by:</p>
+<ul>
+<li>A <code>\</code> followed by a character that is not a newline matches that character. This includes all special characters.</li>
+<li>A caret <code>^</code> matches the start of a line. It is also called a <em>starting anchor</em></li>
+<li>A dollar sign <code>$</code> matches the end of a line. It is also called an <em>ending anchor</em>.</li>
+<li>A dot <code>.</code> matches any character.</li>
+<li>A single character that has no special meaning matches that character.</li>
+<li>A string enclosed in square brackets <code>[]</code> matches any character in the string. ASCII characters can also be abbreviated as <code>a-z0-9</code>. If a <code>^</code> is the first character inside the brackets, it matches any character that is NOT inside the brackets.</li>
+<li>A regular expression followed by an asterisk <code>*</code> matches a sequence of zero or more occurrences of the regular expression.</li>
+<li>A regular expression followed by a plus sign <code>+</code> matches a sequence of one or more occurrences of the regular expression.</li>
+<li>A regular expression followed by a question mark <code>?</code> matches a sequence of zero or one occurrence of the regular expression.</li>
+<li>Two concatenated regular expressions match an occurrence of the first followed by one of the second.</li>
+<li>Two regular expressions separated by a pipe <code>|</code> match an occurrence of the first or the second.</li>
+<li>Parentheses are used to group a regular expression (and then apply special characters as needed).</li>
+<li>Using <code>@</code> makes the regular expressions case-sensitive.</li>
+<li>Using <code>~</code> makes the regular expressions case-insensitive.</li>
+</ul>
+<h3 id="example-of-a-regular-expression">Example of a regular expression</h3>
+<p>Consider a regular expression that recognizes strings containing an even number of <script type="math/tex">1</script>s:
+<script type="math/tex; mode=display">r = 0^*(10^*10^*)^*</script>
+</p>
+<h2 id="deterministic-finite-automaton-dfa">Deterministic Finite Automaton (DFA)</h2>
+<p>It is a theoretical model used in computer science to represent and recognize patterns or sequences of symbols. It can be formalized as a <script type="math/tex">5</script>-uple <script type="math/tex">M = \langle Q, \Sigma, \delta, q_0, F \rangle</script> where:</p>
+<ul>
+<li>
+<script type="math/tex">Q</script> is the (finite) set of <em>states</em>.</li>
+<li>
+<script type="math/tex">Sigma</script> is the <em>input alphabet</em>, i.e. set of symbols that the DFA can read. For example, in a DFA designed to recognize binary numbers, the input alphabet would be <script type="math/tex">\Sigma = \{0, 1\}</script>.</li>
+<li>
+<script type="math/tex">\delta: Q \times \Sigma \to Q</script> is the <em>transition function</em>. It maps a state and an input symbol to the next state. This function is defined for every combination of states and input symbols. The important thing it that it is <em>deterministic</em>, this means the automaton has a single and well-defined path to follow for each input string.</li>
+<li>
+<script type="math/tex">q_0</script> is the <em>initial state</em>. Every time <script type="math/tex">M</script> starts processing a string, it begins from this state. </li>
+<li>
+<script type="math/tex">F \subseteq Q</script> is the set of <em>accepting states</em>. This states define that if the automaton ends up after processing the input string, the string is considered accepted.</li>
+</ul>
+<p>A DFA <script type="math/tex">M</script> recieves an input string <script type="math/tex">s \in \Sigma^*</script> (where <script type="math/tex">\Sigma</script>^* is the <em>Kleene clause</em> of <script type="math/tex">Sigma</script>), and processes it from its initial state using its transition function. If at the end, we are at one of the accepting states, the string is considered <em>recognized</em> by the DFA. Therefore, we can formally define the <em>recognized language</em> of <script type="math/tex">M</script> as the set of strings that recognizes, by
+<script type="math/tex; mode=display">\mathcal{L}(M) = \{s \in \Sigma^*: \delta(q_0, s) \in F\}</script>
+where we are abusing notation to allow <script type="math/tex">\delta</script> recognize strings and not only characters.</p>
+<p>Remember that a DFA is a theoretical model. When we implement it, we can allow more freedom or restrictions according to out neccesities. For example, the DFAs generated by ZK Regex have the additional restriction of only having one accepting state (<script type="math/tex">|F| = 1</script>). We also encourage to think the transition function of a DFA as a graph, where the states are nodes and reading a character represents an edge.</p>
+<p>Another useful algorithm is DFA minimization. For every DFA <script type="math/tex">M</script>, there exists another DFA <script type="math/tex">M'</script> such that <script type="math/tex">\mathcal{L}(M) = \mathcal{L}(M')</script> and <script type="math/tex">M'</script> has the least possible amount of states. ZK Regex just uses the same algorithm provided by the <code>DFA</code> Rust crate.</p>
+<h3 id="example-of-a-dfa">Example of a DFA</h3>
+<p>Consider a simple DFA that recognizes binary strings containing an even number of <script type="math/tex">1</script>s:
+<script type="math/tex; mode=display">M = \langle \{q_0, q_1\}, \{0, 1\}, \delta, q_0, \{q_0\}\rangle</script>
+The automaton is in the state <script type="math/tex">q_0</script> when it has recieved an even number of <script type="math/tex">1</script>s (that is why it is an accepting state), and it is in the state <script type="math/tex">q_1</script> when it has recieved an odd number of <script type="math/tex">1</script>s. Of course, its transition function is given by:</p>
+<ul>
+<li>
+<script type="math/tex">\delta(q_0, 0) = q_0</script>
+</li>
+<li>
+<script type="math/tex">\delta(q_0, 1) = q_1</script>
+</li>
+<li>
+<script type="math/tex">\delta(q_1, 0) = q_1</script>
+</li>
+<li>
+<script type="math/tex">\delta(q_1, 1) = q_0</script>
+</li>
+</ul>
+<h2 id="relation-between-regular-expressions-and-dfa">Relation between regular expressions and DFA</h2>
+<p>The main result is that regular expressions and DFA are equivalent. This means that given any regular expression, you can construct a DFA that accepts the same language described by that regular expression. And conversely, for every DFA, there exists a regular expression that describes the language accepted by that DFA. This means that the set of strings accepted by a DFA can be expressed by some regular expression.</p>
+<p>And in fact, this result is proven by construction! This means we know algorithms that can do this. In particular, the first part of ZK Regex works by converting a regular expression to a DFA. The difference is that there is more data, as described in the <strong>Structures</strong> page, that describes which sections of a regular expression must be public parameters or private parameters in the final circuit. Usually, the basic algorithm involves several steps:</p>
+<ul>
+<li>Converting Regex to NFA (Non-Deterministic Finite Automaton).</li>
+<li>Converting NFA to DFA.</li>
+</ul>
+<p>There does exist crates for the basic algorithm and structures in Rust, but the algorithm needs to be modified because of the cryptographic requirements of ZK Regex. Refer to the <strong>Obtaining DFA</strong> page for more information about this implementation.</p>
+<h2 id="circom-circuits">Circom Circuits</h2>
+<p>TODO</p>
+<h3 id="isequal">IsEqual</h3>
+<h3 id="lessequalthan">LessEqualThan</h3>
+<h3 id="and">AND</h3>
+<h3 id="multior">MultiOR</h3>
+<h2 id="useful-links">Useful links</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Deterministic_finite_automaton">DFA</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Regular_expression">Regular Expressions</a></li>
+<li><a href="https://regexr.com/">Experiment with regex!</a></li>
+<li><a href="https://www-2.dc.uba.ar/staff/becher/Hopcroft-Motwani-Ullman-2001.pdf">PDF about theory of Automatons and Regular Expressions</a></li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

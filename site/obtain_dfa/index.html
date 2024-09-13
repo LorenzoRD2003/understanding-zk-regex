@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Obtaining the DFA - Understanding ZK Regex</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" disabled>
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Understanding ZK Regex</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Introduction</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../preconcepts/" class="nav-link">Concepts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../structures/" class="nav-link">Structures</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Obtaining the DFA</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../obtain_circom/" class="nav-link">Obtaining the Circuit</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../structures/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../obtain_circom/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                              <button id="theme-menu" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme" class="nav-link dropdown-toggle">
+                                <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                <span class="d-lg-none ms-2">Toggle theme</span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="fa-solid fa-sun fa-fw"></i>
+                                    <span class="ms-2">Light</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="fa-solid fa-moon fa-fw"></i>
+                                    <span class="ms-2">Dark</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                    <span class="ms-2">Auto</span>
+                                    <i class="fa-solid fa-check ms-auto"></i>
+                                  </button>
+                                </li>
+                              </ul>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script src="../js/darkmode.js"></script>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#convert-from-regex-to-dfa" class="nav-link">Convert from regex to DFA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#initialize-all-the-mutable-structures-to-be-used" class="nav-link">Initialize all the (mutable) structures to be used</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#main-cycle" class="nav-link">Main cycle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#construct-the-main-structure" class="nav-link">Construct the main structure</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="convert-from-regex-to-dfa">Convert from regex to DFA</h1>
+<pre><code class="language-rust">fn get_regex_and_dfa(
+  decomposed_regex: &amp;mut DecomposedRegexConfig, // regex parts
+) -&gt; Result&lt;RegexAndDFA, CompilerError&gt;
+</code></pre>
+<p>The purpose of this function if to obtain the main structure than the function which will convert from DFA to Circom code will use. Refer to the <strong>Structures</strong> page for understanding its design.</p>
+<h2 id="initialize-all-the-mutable-structures-to-be-used">Initialize all the (mutable) structures to be used</h2>
+<ul>
+<li>A <code>DFAGraph</code> with an empty vector of states. This is called <code>net_dfa_graph</code>, because later we will loop through the <code>decomposed_regex</code>, creating a new <code>DFAGraph</code> for each part of the regular expression and concatenating it to the network.</li>
+<li>Two empty vectors for the <code>substring_ranges</code> and <code>substring_boundaries</code> arrays of <code>SubstringDefinitions</code>.</li>
+<li>A default configuration for the DFA (<code>create_dfa_config</code> function), it is a <code>Config</code> object as defined in the <code>regex_automata::dfa</code> Rust crate. Particularly, it states that the generated DFA should be minimized, that it should start anchored (i.e. with a <em>starting anchor</em> <code>^</code>), that it will not have byte classes, and that it will have acceleration enabled.</li>
+</ul>
+<h3 id="search-for-the-first-caret">Search for the first caret</h3>
+<p>This is achieved by the <code>process_caret_in_regex</code> function. Search for the first caret <code>^</code> that is not within parentheses in the regular expression, if there is one (it is an <code>Option&lt;usize&gt;</code> indicating the position of the symbol within the regular expression, so if there does not exist, it will return <code>None</code>).</p>
+<p>If it exists, divide the regular expression into two parts, before (non-inclusive) and after (inclusive) the caret (and updating the <code>Deque</code> in the <code>decomposed_regex</code> accordingly). The regular expression part before the caret will be set to private, so it will be guaranteed that the second element of the <code>Deque</code> is a regular expression part which starts with a caret.</p>
+<p>Remember from the <strong>Preconcepts</strong> page that a caret in a regular expression matches the start of a line (or in the usual case, the beginning of a regular expression). This is why it is also called a <em>starting anchor</em>, and it means that we should be looking for a match at the beginning of a string.</p>
+<h2 id="main-cycle">Main cycle</h2>
+<p>For each part of the regular expression in <code>decomposed_regex</code>, do the following:</p>
+<h3 id="validate-end-anchor">Validate end anchor</h3>
+<p>The important thing to address here is that none of the parts of the <code>decomposed_regex</code> should end with <code>$</code> except for the last one. Therefore, the <code>validate_end_anchor</code> function checks that if we are not processing the last part in the <code>decomposed_regex</code>, it does not end with <code>$</code>, and if it is the last part, obtain a <code>bool</code> indicating whether it ends with <code>$</code> and store this in the <code>RegexAndDFA</code> structure under the property <code>has_end_anchor</code>.</p>
+<h3 id="construct-the-dfa-for-each-part">Construct the DFA for each part</h3>
+<p>The algorithm constructs a DFA for the part in question. This is done by the <code>DFA::builder()</code> function of the <code>regex_automata::dfa</code> Rust crate, with the particular configuration indicated in a previous subsection. This returns... TODO</p>
+<h3 id="transform-the-dfa-into-a-dfagraph">Transform the DFA into a <code>DFAGraph</code></h3>
+<p>The algorithm transforms that DFA (represented as a <code>DFA&lt;Vec&lt;u32&gt;&gt;</code> structure of the <code>regex_automata::dfa</code> Rust crate) into a graph using the <code>convert_dfa_to_graph</code> function, obtaining a <code>DFAGraph</code> structured called <code>dfa_graph</code>. In particular, the function does these things:</p>
+<ul>
+<li>Converts the DFA to a string representation. This is with the <code>format!</code> Rust macro.</li>
+<li>Creates an empty <code>DFAGraphInfo</code> structure (refer to <strong>Structures</strong> for more information), which will be populated with the next step.</li>
+<li>Parses states from the string representation with the <code>parse_states</code> function, which will recieve as parameters mutable references to both the string representation and the <code>DFAGraphInfo</code> structure. This function will be better explained in an update of this documet, but as a resume it uses regular expressions to match state definitions and transitions in the input string, iterating over state matches in order to create <code>DFAStateInfo</code> objects for each state (each node in the graph), then it parses transitions for each state (with the <code>parse_transition</code>) function to populate the edges of that state, and finally it populates the <code>states</code> parameter of the <code>DFAGraphInfo</code> with the parsed states.</li>
+<li>Handles End of Input (EOI) transitions. In particular, if an state <script type="math/tex">q</script> has a transition to another through the EOI symbol, it will be removed from the edges, and <script type="math/tex">q</script> will be marked as an accepting state (with the <code>typ</code> property in the <code>DFAStateInfo</code> structure).</li>
+<li>Finds the start state of the string representation of the DFA using <code>find_start_state</code>, obtaining its ID.</li>
+<li>Sorts and renames states accordingly given the <code>DFAGraphInfo</code> structure and the start identifier. This is achieved by performing a Performs a BFS (with a queue implemented as a <code>VecDeque</code>) in the graph from the start state, creating a mapping of old states IDs to new ones, renaming states and updating their edges according to the mapping. This means each <code>DFAStateInfo</code> is modified, but the obtained <code>DFAGraphInfo</code> is equivalent to the original (in the sense that the formal DFA they represent is the same, or at least recognizes the same language).</li>
+<li>Before converting the <code>DFAGraphInfo</code> structure into a <code>DFAGraph</code>, it has to call the function <code>process_state_edges</code> because the properties for the edges in the <code>DFAGraphInfo</code> and <code>DFAGraph</code> structures are different. It converts from <code>Map&lt;String, usize&gt;</code> to <code>Map&lt;usize, Set&lt;u8&gt;&gt;</code>. In particular, remember that for efficiency, there are two types of edges in <code>DFAGraphInfo</code>, single character edges and range edges, so it has to address these different cases in the <code>process_edge</code> function. </li>
+<li>With the transitions of the expected type, it converts the <code>DFAGraphInfo</code> structure into a <code>DFAGraph</code> that which will put inside the <code>RegexAndDFA</code> and be used by the Circom code generator. We obtain a <code>dfa_graph</code> (remember that an important property of this structure is that it only has one accepting state).</li>
+</ul>
+<h3 id="handle-a-caret-in-the-first-part">Handle a caret in the first part</h3>
+<p>If there is a caret <code>^</code> in the first part of the <code>decomposed_regex</code>, the <code>dfa_graph</code> returned by the previous function is not able to accept the empty string, but it should! Therefore, there is a <code>handle_regex_caret</code> function for this. It addresses two cases:</p>
+<ul>
+<li>The regex is <code>^</code>. In this case the graph generated will be very simple as it only contains two states and one transition from the starting state to the accepting state for the character of byte value <script type="math/tex">255</script>.</li>
+<li>The regex is not <code>^</code>. In this case it modifies the <code>dfa_graph</code> by clearing the the state type of its initial state, finding its accepting state and adding a transition from the start state to the accept state for the character of byte value <script type="math/tex">255</script>.</li>
+</ul>
+<h3 id="rename-the-states">Rename the states</h3>
+<p>We want to concatenate the new <code>dfa_graph</code> for the current <code>decomposed_regex</code> into the <code>net_dfa_graph</code>, but we want to avoid ID collisions. To achieve this, we have to obtain the highest state ID in the <code>net_dfa_graph</code>. Remember that each ID is just a number, so if the maximum index for <code>net_dfa_graph</code> is <script type="math/tex">m</script>, it is possible to rename the <code>dfa_graph</code> states as <script type="math/tex">[m, m + 1, \ldots, m + k - 1]</script> if it has <script type="math/tex">k</script> states.</p>
+<h3 id="if-the-decomposed_regex-part-is-public">If the <code>decomposed_regex</code> part is public...</h3>
+<p>We have to process the regular expression and both the <code>net_dfa_graph</code> and <code>dfa_graph</code> before the concatenation, in a function called <code>process_public_regex</code>. This is to be able to obtain the data needed to be stored by the <code>SubstringDefinitions</code> structure. It is indicated how this works and why it is necessary in the (<code>SubstringDefinitions</code> subsection in <strong>Structures</strong>).</p>
+<h3 id="concatenate-the-graph-to-the-network">Concatenate the graph to the network</h3>
+<p>Effectively concatenate <code>dfa_graph</code> to <code>net_dfa_graph</code>, returning a new <code>DFAGraph</code> which will be saved as the new <code>net_dfa_graph</code> (even though this <code>add_dfa</code> function merely extends the vector of states).</p>
+<h2 id="construct-the-main-structure">Construct the main structure</h2>
+<p>From the parameters obtained, we are able to construct the <code>RegexAndDFA</code> structure (refer to <strong>Structures</strong> to remember which they are).</p>
+<p>Specifically, the regular expression stored in the structure is the string concatenation of the parts of the <code>decomposed_regex</code>, while the logic of which parts to keep secret is incorporated into the <code>net_dfa_graph</code>.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

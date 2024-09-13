@@ -39,4 +39,4 @@ I expect it to take me about two to three more weeks of work. And these are the 
 - Finish the `obtain_dfa.md` file. ✅
 
 ## How to use?
-Just enter this URL: 
+Just enter this URL: [Understanding ZK Regex](https://lorenzord2003.github.io/understanding-zk-regex/)
