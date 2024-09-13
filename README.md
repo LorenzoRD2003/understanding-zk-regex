@@ -2,7 +2,7 @@
 Started by Lorenzo Ruiz Díaz as a public contribution for the PSE Core Program 2024.
 
 ## Roadmap to 1.0.0 version 🎯
-Right now we are like in a 0.4.0 version. Before releasing the 1.0.0 version of this documentation, more tasks need to be finished. These are the tasks that remain to do (as 2024-09-13):
+Right now we are like in a 0.4.0 version (??). Before releasing the 1.0.0 version of this documentation, more tasks need to be finished. These are the tasks that remain to do (as 2024-09-13):
 
 - Add an example to the algorithm of conversion from regular expression to DFA. 📌
 - Complete the **Circom components** subsection in `preconcepts.md`. 📌

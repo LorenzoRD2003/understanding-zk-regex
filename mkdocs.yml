@@ -1,4 +1,6 @@
 site_name: Understanding ZK Regex
+docs_dir: docs
+site_dir: src
 theme:
   name: mkdocs
   color_mode: auto
@@ -7,7 +9,6 @@ theme:
   hljs_languages:
     - yaml
     - rust
-locale: en
 extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 markdown_extensions:
